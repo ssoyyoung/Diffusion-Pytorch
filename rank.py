@@ -18,6 +18,7 @@ from sklearn import preprocessing
 def search():
     n_query = len(queries)
     diffusion = Diffusion(np.float32(np.vstack([queries, gallery])), args.cache_dir)
+    print("diffusion shape",diffusion.features.shape)
 
     # offline type : scipy.sparse.csr.csr_matrix (희소행렬)
     # offline shape : (5118 ,5118) >> query와 gallery의 합
@@ -88,6 +89,7 @@ if __name__ == "__main__":
     args = parse_args()
     if not os.path.isdir(args.cache_dir): os.makedirs(args.cache_dir)
 
+    # IN PAPER : DATABASE = X, QUERY = Q
     dataset = Dataset(args.query_path, args.gallery_path)
     queries, gallery = dataset.queries, dataset.gallery
 

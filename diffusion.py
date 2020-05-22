@@ -86,7 +86,11 @@ class Diffusion(object):
             lap_alpha = self.get_laplacian(sims, ids)
         else:
             sims, ids = self.knn.search(self.features, n_trunc)
-            trunc_ids = ids
+            print("sims", sims)
+            print("sims.shape", sims.shape) #(d+q, truncate) = (5118, 1000)
+            print("ids", ids)
+            print("ids.shape", ids.shape) #(d+q, truncate) = (5118, 1000)
+            trunc_ids = ids # Index value
 
             # 논문상에서 Laplacian 행렬 구하는 부분 La-1/2 = (I-aS)-1/2
             ## lap_alpha.shape = (5118,5118)
