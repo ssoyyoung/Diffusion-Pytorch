@@ -10,7 +10,6 @@ __pycache__/
 data/*/*
 data/*
 tmp/*
-pirsData/*
 
 # matlab
 *.mat

@@ -12,8 +12,8 @@ import os.path
 float32 = np.dtype('>f4')
 
 # define path
-json_path = "full_dataset.json"
-pkl_path = "./pirsData/pirsData.pkl"
+json_path = "/home/full_dataset.json"
+pkl_path = "./data/pirsData.pkl"
 
 def decode_float_list(base64_string):
     bytes = base64.b64decode(base64_string)
