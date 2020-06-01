@@ -7,6 +7,29 @@ DATASET=oxford5k
 # resnet or siamac
 FEATURE_TYPE=resnet
 
+# directory to data
+PIRS_DATA_DIR=./pirsData
+# directory to cache files
+PIRS_TMP_DIR=./pirsTmp
+# oxford5k, oxford105k, paris6k, paris106k
+PIRS_DATASET=resnet
+# resnet or siamac
+PIRS_FEATURE_TYPE=1024
+# category type
+PIRS_CATEGORY=c_17
+
+
+.PHONY: pirs
+pirs:
+	python rank.py \
+		--cache_dir $(PIRS_TMP_DIR)/$(PIRS_DATASET)_$(PIRS_FEATURE_TYPE) \
+		--query_path $(PIRS_DATA_DIR)/query/vector_$(PIRS_CATEGORY).npy  \
+		--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$(PIRS_CATEGORY).npy  \
+		--gnd_path $(PIRS_DATA_DIR)/id_$(PIRS_CATEGORY).npy  \
+		--dataset_name $(PIRS_DATASET) \
+		--truncation_size 1000
+
+
 .PHONY: rank
 rank:
 	python rank.py \

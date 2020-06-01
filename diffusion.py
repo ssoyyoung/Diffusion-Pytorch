@@ -86,15 +86,14 @@ class Diffusion(object):
             lap_alpha = self.get_laplacian(sims, ids)
         else:
             sims, ids = self.knn.search(self.features, n_trunc)
-            print("sims", sims)
             print("sims.shape", sims.shape) #(d+q, truncate) = (5118, 1000)
-            print("ids", ids)
             print("ids.shape", ids.shape) #(d+q, truncate) = (5118, 1000)
             trunc_ids = ids # Index value
 
             # 논문상에서 Laplacian 행렬 구하는 부분 La-1/2 = (I-aS)-1/2
             ## lap_alpha.shape = (5118,5118)
-            lap_alpha = self.get_laplacian(sims[:, :kd], ids[:, :kd])
+            lap_alpha = self.get_laplacian(sims[:, :kd], ids[:, :kd]) # 상위 50개(kd)
+
             print("lap_alpha..",type(lap_alpha))
             print(lap_alpha.shape)
 
@@ -107,6 +106,7 @@ class Diffusion(object):
                                       for i in tqdm(range(self.N),
                                                     desc='[offline] diffusion'))
         print(np.array(results).shape)
+
         ## type(result) = List, len(result) : 5118
         print("results type..",type(results))
         print("results shape..", len(results))
@@ -131,6 +131,7 @@ class Diffusion(object):
         """Get Laplacian_alpha matrix
         """
         affinity = self.get_affinity(sims, ids)
+        # affinity.shape = (q+g, q+g)
         num = affinity.shape[0]
         degrees = affinity @ np.ones(num) + 1e-12
         # mat: degree matrix ^ (-1/2)
@@ -146,14 +147,15 @@ class Diffusion(object):
     def get_affinity(self, sims, ids, gamma=3):
         """Create affinity matrix for the mutual kNN graph of the whole dataset
         Args:
-            sims: similarities of kNN
-            ids: indexes of kNN
+            sims: similarities of kNN >> sims.shape : (5118, 50)
+            ids: indexes of kNN >> ids.shape : (5118, 50)
         Returns:
             affinity: affinity matrix
         """
+
         num = sims.shape[0]
-        sims[sims < 0] = 0  # similarity should be non-negative
-        sims = sims ** gamma
+        sims[sims < 0] = 0  # similarity should be non-negative / 0보다 작은 값이 들어있으면 0으로 변경
+        sims = sims ** gamma # 거듭제곱
         # vec_ids: feature vectors' ids
         # mut_ids: mutual (reciprocal) nearest neighbors' ids
         # mut_sims: similarites between feature vectors and their mutual nearest neighbors

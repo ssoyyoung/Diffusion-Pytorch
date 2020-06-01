@@ -4,6 +4,7 @@
 " rank module "
 
 import os
+import pickle
 import argparse
 import numpy as np
 from dataset import Dataset
@@ -17,6 +18,7 @@ from sklearn import preprocessing
 
 def search():
     n_query = len(queries)
+
     diffusion = Diffusion(np.float32(np.vstack([queries, gallery])), args.cache_dir)
     print("diffusion shape",diffusion.features.shape)
 
@@ -24,6 +26,15 @@ def search():
     # offline shape : (5118 ,5118) >> query와 gallery의 합
     offline = diffusion.get_offline_results(args.truncation_size, args.kd)
     print("offline..", len(offline.data))
+
+    print("offline features shape..",offline.shape)
+
+    count = 0
+    for i in range(2765):
+        if len(np.nonzero(offline.toarray()[i])[0]) < 20:
+            count += 1
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>np zero count", count)
+    
 
     # 컬럼별로 확률화(SUM=1), feature=(1-a)(1-aS)의 역행렬
     features = preprocessing.normalize(offline, norm="l2", axis=1)
@@ -39,8 +50,9 @@ def search():
     print(type(-scores.todense()))
 
     ranks = np.argsort(-scores.todense())
-    print("ranks[0] query result...", ranks[0])
+    print("ranks[0] query result...", ranks)
     # np.argsort : 행렬 안에서 값이 작은 값부터 순서대로 데이터의 INDEX 반환
+
 
 
 def parse_args():
@@ -82,6 +94,7 @@ def parse_args():
                         """)
     args = parser.parse_args()
     args.kq, args.kd = 10, 50
+
     return args
 
 
@@ -92,6 +105,21 @@ if __name__ == "__main__":
     # IN PAPER : DATABASE = X, QUERY = Q
     dataset = Dataset(args.query_path, args.gallery_path)
     queries, gallery = dataset.queries, dataset.gallery
+    
+    # queries = np.array([[1, 0]], dtype=np.float32)
+    # gallery = np.array([[0, 1], [1, 2], [1, 3], [2, -1]], dtype=np.float32)
+    # queries : float32 / gallery = float32
+
+    """ pkl_path = "./pirsData/pirsData.pkl"
+    with open(pkl_path, "rb") as f: data = pickle.load(f)
+
+    vector = np.array(data['total_vec']['C11']) #(doc_count, vec_length)
+    _id = np.array( data['total_id']['C11'])
+
+    queries = vector[:10]
+    gallery = vector[10:]
+    queries_id = _id[:10]
+    gallery_id = _id[10:] """
 
     print("\n#######################################")
     print("INFO",
@@ -101,3 +129,5 @@ if __name__ == "__main__":
     print("#######################################")
 
     search()
+
+    # old_search()

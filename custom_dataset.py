@@ -12,8 +12,8 @@ import os.path
 float32 = np.dtype('>f4')
 
 # define path
-json_path = "/home/full_dataset.json"
-pkl_path = "./data/pirsData.pkl"
+json_path = "full_dataset.json"
+pkl_path = "./pirsData/pirsData.pkl"
 
 def decode_float_list(base64_string):
     bytes = base64.b64decode(base64_string)
@@ -36,17 +36,13 @@ def create_pkl():
 
     with open(pkl_path, "wb") as file:
         pickle.dump({"total_vec": total_vec, "total_id": total_id}, file)
-
-    vector = np.array(total_vec)
-    _id = np.array(total_id)
-    np.save("./data/psrData.npy", vector) 
-    np.save("./data/psrDataID.npy", _id)
-
+    
+        
 
 def read_file():
     # Loading pickle data
     if not os.path.isfile(pkl_path): create_pkl()
-    with open(pkl_path, "rb") as f: data = pickle.load(f)
+    with open(pkls_path, "rb") as f: data = pickle.load(f)
     print("total_vec..", len(data['total_vec']), "total_id..", len(data['total_id']))
 
     total_vec = data['total_vec']['A12']
@@ -60,10 +56,6 @@ def read_file():
 
 if __name__ == "__main__":
     read_file()
-
-
-
-
 
 
 
@@ -96,7 +88,7 @@ vec : J13 ..... 117096
 
 category= ['C10', 'C11', 'C12', 'C13', 'C14', 'C15', 'C16', 'C17', 'C18',
             'F10', 'F11', 'F12', 'B10', 'B11', 'B12', 'B13',
-            'J10', 'J11', 'J12', 'J13',
+            'J10', 'J11', 'J12', 'J13',s
             'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16', 'A17']
 
 cate_dic = {

@@ -81,6 +81,9 @@ class ANN(BaseKNN):
 
         self.index = faiss.IndexIVFPQ(self.quantizer, self.D, nlist, M, nbits)
         samples = database[np.random.permutation(np.arange(self.N))[:self.N // 5]]
+
+        np.save("test.npy", samples)
+
         print("[ANN] train")
         self.index.train(samples)
         self.add()
