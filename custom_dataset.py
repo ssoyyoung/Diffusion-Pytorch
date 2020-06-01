@@ -37,7 +37,11 @@ def create_pkl():
     with open(pkl_path, "wb") as file:
         pickle.dump({"total_vec": total_vec, "total_id": total_id}, file)
 
-        #
+    vector = np.array(total_vec)
+    _id = np.array(total_id)
+    np.save("./data/psrData.npy", vector) 
+    np.save("./data/psrDataID.npy", _id)
+
 
 def read_file():
     # Loading pickle data
