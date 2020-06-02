@@ -16,7 +16,7 @@ PIRS_DATASET=resnet
 # resnet or siamac
 PIRS_VECTOR_LEN=1024
 # category type
-PIRS_CATEGORY=a_11
+PIRS_CATEGORY=b_11
 
 .PHONY: pirs
 pirs:
@@ -26,6 +26,7 @@ pirs:
 		--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$(PIRS_CATEGORY).npy  \
 		--gnd_path $(PIRS_DATA_DIR)/id_$(PIRS_CATEGORY).npy  \
 		--dataset_name $(PIRS_DATASET) \
+		--cate $(PIRS_CATEGORY) \
 		--truncation_size 1000
 
 
@@ -33,6 +34,11 @@ PIRS_CATEGORYS= a_11 a_12 a_13 a_14 a_15 a_16 a_17 \
 				b_11 b_12 b_13 \
 				c_11 c_12 c_13 c_14 c_15 c_16 c_17 c_18 \
 				f_11 f_12 j_11 j_12 j_13
+
+#PIRS_CATEGORYS= b_11 b_12 b_13 \
+				c_11 c_12 c_13 c_14 c_15 c_16 c_17 c_18 \
+				f_11 f_12 j_11 j_12 j_13
+
 
 
 .PHONY: pirsFor
@@ -44,6 +50,7 @@ pirsFor:
 			--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$$CATEGORY.npy  \
 			--gnd_path $(PIRS_DATA_DIR)/id_$$CATEGORY.npy  \
 			--dataset_name $(PIRS_DATASET) \
+			--cate $$CATEGORY \
 			--truncation_size 1000; \
 	done
 
