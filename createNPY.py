@@ -6,14 +6,17 @@ from ast import literal_eval
 
 
 # decode vector
-#float32 = np.dtype('f4')
+float32 = np.dtype('>f4')
+# > : big-endian
+# < : little-endian
+# f4 : float32 (it has 4 bytes and each byte has 8 bits)
 
 def decode_float_list(base64_string):
     bytes = base64.b64decode(base64_string)
-    return np.frombuffer(bytes, dtype=np.float32).tolist()
+    return np.frombuffer(bytes, dtype=float32).tolist()
 
 
-def create(fileName):
+def galleryCreate(fileName):
     with open(fileName, "r") as f: originData = f.readlines()
 
     total_vec = []
@@ -60,16 +63,18 @@ def queryCreate(fileName):
 
 if __name__ == "__main__":
 
-    
+    # create query npy
+    queryN = "/data/github/elastic/testset_pirs.json"
+    queryCreate(queryN)
 
     # create gallery npy
-    fileList = glob.glob("/data/github/elastic/*.*")
+    fileList = glob.glob("/data/github/elastic/resnet/*.*")
 
     for fileN in fileList:
         saveCheck="pirsData/gallery/"+(fileN.split("/")[-1].split(".")[0]).replace("resnet1024_*","vector")+".npy"
         if os.path.isfile(saveCheck): 
             print(saveCheck, "already saved..!")
             continue
-        create(fileN)
+        galleryCreate(fileN)
 
     

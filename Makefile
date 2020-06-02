@@ -14,20 +14,44 @@ PIRS_TMP_DIR=./pirsTmp
 # oxford5k, oxford105k, paris6k, paris106k
 PIRS_DATASET=resnet
 # resnet or siamac
-PIRS_FEATURE_TYPE=1024
+PIRS_VECTOR_LEN=1024
 # category type
-PIRS_CATEGORY=c_17
-
+PIRS_CATEGORY=a_11
 
 .PHONY: pirs
 pirs:
 	python rank.py \
-		--cache_dir $(PIRS_TMP_DIR)/$(PIRS_DATASET)_$(PIRS_FEATURE_TYPE) \
+		--cache_dir $(PIRS_TMP_DIR)/$(PIRS_DATASET)_$(PIRS_VECTOR_LEN)/$(PIRS_CATEGORY) \
 		--query_path $(PIRS_DATA_DIR)/query/vector_$(PIRS_CATEGORY).npy  \
 		--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$(PIRS_CATEGORY).npy  \
 		--gnd_path $(PIRS_DATA_DIR)/id_$(PIRS_CATEGORY).npy  \
 		--dataset_name $(PIRS_DATASET) \
 		--truncation_size 1000
+
+
+PIRS_CATEGORYS= a_11 a_12 a_13 a_14 a_15 a_16 a_17 \
+				b_11 b_12 b_13 \
+				c_11 c_12 c_13 c_14 c_15 c_16 c_17 c_18 \
+				f_11 f_12 j_11 j_12 j_13
+
+
+.PHONY: pirsFor
+pirsFor:
+	for CATEGORY in $(PIRS_CATEGORYS); do \
+		python rank.py \
+			--cache_dir $(PIRS_TMP_DIR)/$(PIRS_DATASET)_$(PIRS_VECTOR_LEN)/$$CATEGORY \
+			--query_path $(PIRS_DATA_DIR)/query/vector_$$CATEGORY.npy  \
+			--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$$CATEGORY.npy  \
+			--gnd_path $(PIRS_DATA_DIR)/id_$$CATEGORY.npy  \
+			--dataset_name $(PIRS_DATASET) \
+			--truncation_size 1000; \
+	done
+
+
+
+
+
+
 
 
 .PHONY: rank

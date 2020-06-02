@@ -4,6 +4,7 @@
 " rank module "
 
 import os
+import time
 import pickle
 import argparse
 import numpy as np
@@ -17,40 +18,39 @@ from sklearn import preprocessing
 # main : rank.py
 
 def search():
+    st = time.time()
     n_query = len(queries)
-
-    diffusion = Diffusion(np.float32(np.vstack([queries, gallery])), args.cache_dir)
+    print("min..", np.min(queries))
+    print("max..", np.max(queries))
+    diffusion = Diffusion(np.vstack([queries, gallery]), args.cache_dir)
     print("diffusion shape",diffusion.features.shape)
 
     # offline type : scipy.sparse.csr.csr_matrix (희소행렬)
     # offline shape : (5118 ,5118) >> query와 gallery의 합
     offline = diffusion.get_offline_results(args.truncation_size, args.kd)
+    # offline.data 안에 nan 값이 존재함 
     print("offline..", len(offline.data))
 
     print("offline features shape..",offline.shape)
 
-    count = 0
-    for i in range(2765):
-        if len(np.nonzero(offline.toarray()[i])[0]) < 20:
-            count += 1
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>np zero count", count)
-    
+    offline.data = np.nan_to_num(offline.data, copy=False)
 
     # 컬럼별로 확률화(SUM=1), feature=(1-a)(1-aS)의 역행렬
     features = preprocessing.normalize(offline, norm="l2", axis=1)
     print("features..",features.shape)
 
     scores = features[:n_query] @ features[n_query:].T
-    print("1", features[:n_query].shape)
-    print("2", features[n_query:].shape)
-    print("3", (features[n_query:].T).shape)
-    print("4", scores.shape)
-    print("type(scores)",type(scores))
+    np.save("pirsData/scores/"+ cate +"_scores.npy", scores)
+
+    print("1> features[:n_query].shape :", features[:n_query].shape)
+    print("2> features[n_query:].shape :", features[n_query:].shape)
+    print("3> scores.shape :", scores.shape)
     # scores.shape : (55, 5063) = (쿼리, 갤러리) = (row, col)
-    print(type(-scores.todense()))
 
     ranks = np.argsort(-scores.todense())
-    print("ranks[0] query result...", ranks)
+    np.save("pirsData/ranks/"+ cate +"_ranks.npy", ranks)
+    print("ranks[0]...\n", ranks[:10,:10])
+    print("time check...>>>", cate,">>>", time.time()-st, ">>>", len(np.vstack([queries, gallery])))
     # np.argsort : 행렬 안에서 값이 작은 값부터 순서대로 데이터의 INDEX 반환
 
 
@@ -105,7 +105,9 @@ if __name__ == "__main__":
     # IN PAPER : DATABASE = X, QUERY = Q
     dataset = Dataset(args.query_path, args.gallery_path)
     queries, gallery = dataset.queries, dataset.gallery
-    
+
+    cate = args.query_path.split("/")[-1].split(".")[0].split("vector_")[-1]
+
     # queries = np.array([[1, 0]], dtype=np.float32)
     # gallery = np.array([[0, 1], [1, 2], [1, 3], [2, -1]], dtype=np.float32)
     # queries : float32 / gallery = float32
@@ -121,7 +123,8 @@ if __name__ == "__main__":
     queries_id = _id[:10]
     gallery_id = _id[10:] """
 
-    print("\n#######################################")
+    print("\n<< ", cate, " >>")
+    print("#######################################")
     print("INFO",
           "\nquery..", queries.shape,
           "\ngallery..", gallery.shape,
@@ -130,4 +133,3 @@ if __name__ == "__main__":
 
     search()
 
-    # old_search()

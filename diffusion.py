@@ -81,6 +81,7 @@ class Diffusion(object):
         print('[offline] 1) prepare Laplacian and initial state')
         global trunc_ids, trunc_init, lap_alpha
         if self.use_ann:
+            ## cpu usage max
             _, trunc_ids = self.ann.search(self.features, n_trunc)
             sims, ids = self.knn.search(self.features, kd)
             lap_alpha = self.get_laplacian(sims, ids)
