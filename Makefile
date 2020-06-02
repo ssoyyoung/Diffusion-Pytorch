@@ -1,11 +1,31 @@
+############################ TEST ############################
+
 # directory to data
-DATA_DIR=./data
+PIRS_DATA_DIR=./pirsData
 # directory to cache files
-TMP_DIR=./tmp
+PIRS_TMP_DIR=./pirsTmp
 # oxford5k, oxford105k, paris6k, paris106k
-DATASET=oxford5k
+PIRS_DATASET=test
 # resnet or siamac
-FEATURE_TYPE=resnet
+PIRS_VECTOR_LEN=1024
+# category type
+PIRS_CATEGORY=c_15
+
+
+.PHONY: test
+test:
+	python rank.py \
+		--cache_dir $(PIRS_TMP_DIR)/$(PIRS_DATASET)_$(PIRS_VECTOR_LEN)/$(PIRS_CATEGORY) \
+		--query_path $(PIRS_DATA_DIR)/query/vector_$(PIRS_CATEGORY).npy  \
+		--gallery_path $(PIRS_DATA_DIR)/gallery/vector_$(PIRS_CATEGORY).npy  \
+		--gnd_path $(PIRS_DATA_DIR)/id_$(PIRS_CATEGORY).npy  \
+		--dataset_name $(PIRS_DATASET) \
+		--cate $(PIRS_CATEGORY) \
+		--truncation_size 1000
+
+
+
+############################ PIRS ############################
 
 # directory to data
 PIRS_DATA_DIR=./pirsData
@@ -16,7 +36,8 @@ PIRS_DATASET=resnet
 # resnet or siamac
 PIRS_VECTOR_LEN=1024
 # category type
-PIRS_CATEGORY=b_11
+PIRS_CATEGORY=c_15
+
 
 .PHONY: pirs
 pirs:
@@ -30,15 +51,13 @@ pirs:
 		--truncation_size 1000
 
 
+############################ PIRS FOR ############################
+
+
 PIRS_CATEGORYS= a_11 a_12 a_13 a_14 a_15 a_16 a_17 \
 				b_11 b_12 b_13 \
 				c_11 c_12 c_13 c_14 c_15 c_16 c_17 c_18 \
 				f_11 f_12 j_11 j_12 j_13
-
-#PIRS_CATEGORYS= b_11 b_12 b_13 \
-				c_11 c_12 c_13 c_14 c_15 c_16 c_17 c_18 \
-				f_11 f_12 j_11 j_12 j_13
-
 
 
 .PHONY: pirsFor
@@ -55,10 +74,16 @@ pirsFor:
 	done
 
 
+############################ GITHUB ############################
 
-
-
-
+# directory to data
+DATA_DIR=./data
+# directory to cache files
+TMP_DIR=./tmp
+# oxford5k, oxford105k, paris6k, paris106k
+DATASET=oxford5k
+# resnet or siamac
+FEATURE_TYPE=resnet
 
 
 .PHONY: rank

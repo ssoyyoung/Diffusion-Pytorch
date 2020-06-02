@@ -23,6 +23,7 @@ def search():
     n_query = len(queries)
     print("min..", np.min(queries))
     print("max..", np.max(queries))
+
     diffusion = Diffusion(np.vstack([queries, gallery]), args.cache_dir)
     print("diffusion shape",diffusion.features.shape)
 
@@ -41,7 +42,7 @@ def search():
     print("features..",features.shape)
 
     scores = features[:n_query] @ features[n_query:].T
-    np.save("pirsData/scores/"+ args.cate +"_scores.npy", scores)
+    np.save("pirsData/scores/"+ args.cate +"_scores.npy", -scores.todense())
 
     print("1> features[:n_query].shape :", features[:n_query].shape)
     print("2> features[n_query:].shape :", features[n_query:].shape)
@@ -49,7 +50,7 @@ def search():
     # scores.shape : (55, 5063) = (쿼리, 갤러리) = (row, col)
 
     ranks = np.argsort(-scores.todense())
-    np.save("pirsData/ranks/"+ args.cate +"_ranks.npy", ranks)
+    #np.save("pirsData/ranks/"+ args.cate +"_ranks.npy", ranks)
     print("ranks[0]...\n", ranks[:10,:10])
     print("time check...>>>", args.cate,">>>", time.time()-st, ">>>", len(queries))
     # np.argsort : 행렬 안에서 값이 작은 값부터 순서대로 데이터의 INDEX 반환
@@ -108,6 +109,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     if not os.path.isdir(args.cache_dir): os.makedirs(args.cache_dir)
+    
     if not os.path.isfile(args.query_path): 
         print(args.cate, "not query file")
         sys.exit()
@@ -120,8 +122,9 @@ if __name__ == "__main__":
         args.truncation_size = 2000
         args.kd = 200
 
-    # queries = np.array([[1, 0]], dtype=np.float32)
-    # gallery = np.array([[0, 1], [1, 2], [1, 3], [2, -1]], dtype=np.float32)
+    if args.cate == "test":
+        queries = np.array([[1, 0]], dtype=np.float32)
+        gallery = np.array([[0, 1], [1, 2], [1, 3], [2, -1]], dtype=np.float32)
     # queries : float32 / gallery = float32
 
     print("\n<< ", args.cate, " >>")
@@ -139,6 +142,7 @@ if __name__ == "__main__":
 
     if os.path.isfile("pirsData/ranks/"+ args.cate +"_ranks.npy"):
         print("already get offline and rank result!")
+        search()
     elif len(gallery) > 100000:
         print("ann search! >> TODO")
     else:
